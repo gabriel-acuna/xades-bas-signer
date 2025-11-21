@@ -1,1 +1,2 @@
-import { sing } from "./libs/signer";
+import { sign } from "./libs/signer";
+export { sign };

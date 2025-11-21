@@ -150,7 +150,7 @@ function addSignatureNode(params: {
   const { xml, rootElement, signatureNode } = params;
   return xml.replace(`</${rootElement}>`, `${signatureNode}</${rootElement}>`);
 }
-export async function sing(params: {
+export async function sign(params: {
   p12Path: string;
   p12Password: string;
   rootElement: string;
