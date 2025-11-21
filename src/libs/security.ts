@@ -1,5 +1,6 @@
 import * as crypto from "node:crypto";
 import { Encoding } from "node:crypto";
+import * as forge from "node-forge";
 export function sha1ToBase64(text: string, encoding: Encoding): string {
   const HASH = crypto.createHash("sha1").update(text, encoding).digest("hex");
   const BUFFER = Buffer.from(HASH, "hex");
@@ -34,4 +35,13 @@ export function getRandomValues(min: number = 990, max: number = 9999) {
 export function isHexString(str: string) {
   const hexRegEx = /^[0-9a-fA-F]+$/;
   return hexRegEx.test(str);
+}
+export function toSha1(content: string, encoding: forge.Encoding) {
+  const md = forge.md.sha1.create();
+  md.update(content, encoding);
+  return md;
+}
+export function toBase64String(content: any){
+  const buffer = Buffer.from(content, 'utf-8')
+  return buffer.toString('base64')
 }
