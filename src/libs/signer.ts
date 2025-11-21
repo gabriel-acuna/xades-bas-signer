@@ -253,7 +253,7 @@ export async function sign(params: {
     keyInfoNode: keyInfo,
     objectSignarureNode: objectSignature,
   });
-  addSignatureNode({
+  return addSignatureNode({
     xml: xmlData,
     rootElement: params.rootElement,
     signatureNode,
