@@ -1,6 +1,6 @@
 import * as forge from "node-forge";
 import { PKCS88Bags } from "./types";
-import { Certificate } from "crypto";
+
 import {
   bigintToBase64,
   getRandomValues,
@@ -19,7 +19,7 @@ export function getP12(
   return forge.pkcs12.pkcs12FromAsn1(ansi, certKey);
 }
 
-function getIssuerName(cert: forge.pkcs12.Bag) {
+export function getIssuerName(cert: forge.pkcs12.Bag) {
   const issuerTributes = cert.cert?.issuer.attributes;
   let issuerName = issuerTributes
     ?.reverse()
@@ -30,28 +30,47 @@ function getIssuerName(cert: forge.pkcs12.Bag) {
   return issuerName;
 }
 
-function getKeyContainer(pkcs8Bags: PKCS88Bags, friendlyName: string) {
-  let pckcs8;
-  forge.pki.oids;
+export function getKeyContainer(pkcs8Bags: PKCS88Bags, friendlyName: string) {
+  let pkcs8;
+  const oid = forge.pki.oids["pkcs8ShroudedKeyBag"];
+  const bags = pkcs8Bags?.[oid];
+
+  if (!bags || !Array.isArray(bags) || bags.length === 0) {
+    throw new Error("No key bags found in the PKCS#12 certificate.");
+  }
+
   if (friendlyName.includes("BANCO CENTRAL")) {
-    let index = pkcs8Bags[forge.pki.oids["pckcs8ShroudedkeyBag"]]?.findIndex(
-      (key) => key.attributes.friendlyName[0].includes("Signing Key")
+    const index = bags.findIndex((key) =>
+      key?.attributes?.friendlyName?.[0]?.includes("Signing Key")
     );
-    //@ts-ignore
-    pckcs8 = pkcs8Bags[forge.pki.oids.pckcs8ShorudedkeyBag][index];
+    if (!index) {
+      throw new Error("Unable to find the key bag for BANCO CENTRAL");
+    }
+    pkcs8 = bags[index];
+  } else {
+    pkcs8 = bags[0];
   }
-  if (friendlyName.includes("SECURITY DATA")) {
-    //@ts-ignore
-    pckcs8 = pckcs8Bags[forge.pki.oids["pckcs8ShorudedkeyBag"]][0];
+  return pkcs8;
+}
+export function getKey(pckcs8: forge.pkcs12.Bag) {
+  let key: forge.pki.rsa.PrivateKey;
+  if (pckcs8["key"]) {
+    key = pckcs8["key"] as forge.pki.rsa.PrivateKey;
+  } else if (pckcs8["asn1"]) {
+    key = forge.pki.privateKeyFromAsn1(
+      pckcs8["asn1"]
+    ) as forge.pki.rsa.PrivateKey;
+  } else {
+    throw new Error("No private key found in the PKCS#12 key bag.");
   }
-  return pckcs8;
+  return key;
 }
 
 export function getCertificate(certBag: forge.pkcs12.Bag[]) {
   let crt = certBag.reduce(
     (prev: forge.pkcs12.Bag, current: forge.pkcs12.Bag) => {
-      //@ts-ignore
-      return current.cert?.extensions.length > prev.cert?.extensions.length
+      return (current.cert?.extensions?.length ?? 0) >
+        (prev.cert?.extensions?.length ?? 0)
         ? current
         : prev;
     }
@@ -93,7 +112,7 @@ export function getPCK12CertInfo(
   let pckcs8;
   let issuerName = getIssuerName(certBag);
   pckcs8 = getKeyContainer(pkcs8Bags, friendlyName);
-  const key: forge.pki.rsa.PrivateKey = pckcs8["key"] ?? pckcs8["asn1"];
+  let key = getKey(pckcs8);
   const pem = certX509ToPem(cert!);
   let certificateX509 = pem.substring(
     pem.indexOf("\n") + 1,
@@ -136,7 +155,7 @@ export function getPCK12CertInfo(
       certificateX509,
       modulus,
       exponent,
-      key
+      key,
     },
   };
 }
