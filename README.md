@@ -27,7 +27,7 @@ npm install
 - Run tests:
 
 ````ssh
-npm test```
+npm test
 
 ````
 ## Licence
