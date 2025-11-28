@@ -4,6 +4,7 @@
   "description": "XAdES-BES signer utilities for Node.js (TypeScript) — certificate handling and XAdES-BES signature helpers.",
   "main": "/dist/src/main.js",
   "types": "/dist/src/main.d.ts",
+  "files": ["dist", "README.md"],
   "scripts": {
     "start:dev": "npx nodemon",
     "build": "npx tsc",
