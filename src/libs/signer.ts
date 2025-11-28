@@ -172,7 +172,7 @@ export async function sign(params: {
     .replace(/(?=<\>)(\s*)/g, "")
     .replace(/\t|\r/g, "");
 
-  const arayuint8 = new Uint8Array(p12Buffer!);
+  const arayuint8 = new Uint8Array(p12Buffer?.buffer!);
   let certInfo = getPCK12CertInfo(arayuint8, p12Password);
 
   const sha1Xml = sha1ToBase64(

@@ -8,7 +8,7 @@ import {
   sha1ToBase64,
 } from "./security";
 export function getP12(
-  certificate: Uint8Array<ArrayBuffer>,
+  certificate: Uint8Array<ArrayBufferLike>,
   certKey: string
 ): forge.pkcs12.Pkcs12Pfx {
   const der = forge.util.decode64(
@@ -90,7 +90,7 @@ export function certX509ToASN1(certificate: forge.pki.Certificate) {
   return forge.pki.certificateToAsn1(certificate);
 }
 export function getPCK12CertInfo(
-  certificate: Uint8Array<ArrayBuffer>,
+  certificate: Uint8Array<ArrayBufferLike>,
   certKey: string
 ) {
   const p12 = getP12(certificate, certKey);
