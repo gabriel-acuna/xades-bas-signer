@@ -104,7 +104,7 @@ export function getPCK12CertInfo(
   const certBags = data[forge.pki.oids.certBag] ?? [];
   const friendlyName = certBags[1].attributes.friendlyName[0];
   let certBag = getCertificate(certBags);
-  if (isCerticateValid(certBag.cert!)) {
+  if (!isCerticateValid(certBag.cert!)) {
     throw new Error("Invalid certificate, check the validity");
   }
   const cert = certBag.cert;
