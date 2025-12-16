@@ -83,9 +83,10 @@ function getSignedInfoNode(params: {
 }) {
   return (
     `<ds:SignedInfo Id="Signature-SignedInfo${params.signedInfoNumber}">` +
-    `\n<ds:CanonicalizationMethod> Algorithm=”http://www.w3.org/TR/2001/REC-xml-c14n20010315”></ds:CanonicalizationMethod>` +
+    `\n<ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n20010315"></ds:CanonicalizationMethod>` +
     `\n<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"></ds:SignatureMethod>` +
-    `\n<ds:Reference Id="SignedPropertiedID${params.signedPropertiesIdNumber}"> Type="http://uri.etsi.org/01903#SignedProperties" URI="#Signature${params.signatureNumber}-SignedProperties${params.signedPropertiesNumber}">` +
+    `\n<ds:Reference Id="SignedPropertiesID${params.signedPropertiesIdNumber}" `
+    +`Type="http://uri.etsi.org/01903#SignedProperties" URI="#Signature${params.signatureNumber}-SignedProperties${params.signedPropertiesNumber}">` +
     `\n<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"></ds:DigestMethod>` +
     `\n<ds:DigestValue>${params.sha1SignedProperties}</ds:DigestValue>` +
     `\n</ds:Reference>` +
@@ -100,18 +101,18 @@ function getSignedInfoNode(params: {
     `\n<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"></ds:DigestMethod>` +
     `\n<ds:DigestValue>${params.sha1Xml}</ds:DigestValue>` +
     `\n</ds:Reference>` +
-    `</ds:SignedInfo`
+    `</ds:SignedInfo>`
   );
 }
 function getSignatureObject(params: {
   signatureNumber: number;
   objectNumber: number;
-  signedInfo: string;
+  signedProperties: string;
 }) {
   const objectSignature =
     `<ds:Object Id="Signature${params.signatureNumber}-Object${params.objectNumber}">` +
     `<etsi:QualifyingProperties Target="#Signature${params.signatureNumber}">` +
-    `${params.signedInfo}` +
+    `${params.signedProperties}` +
     `</etsi:QualifyingProperties></ds:Object>`;
   return objectSignature;
 }
@@ -180,7 +181,7 @@ export async function sign(params: {
     "utf8"
   );
   const namespaces =
-    'xmlns:ds="http://www.w3.org/2000/09/xmldsig#namespace xmlns:estsi="http://uri.etsi.org/01903/v1.3.2#"';
+    'xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:estsi="http://uri.etsi.org/01903/v1.3.2#"';
 
   let signedProperties = getSignedPropertiesNode({
     signatureNumber: certInfo.radomValues.signatureNumber,
@@ -243,7 +244,7 @@ export async function sign(params: {
   const objectSignature = getSignatureObject({
     signatureNumber: certInfo.radomValues.signatureNumber,
     objectNumber: certInfo.radomValues.objectNumber,
-    signedInfo,
+    signedProperties,
   });
   const signatureNode = getSignatureNode({
     namespaces,

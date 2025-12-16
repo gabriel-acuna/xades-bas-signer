@@ -123,7 +123,7 @@ export function getPCK12CertInfo(
   const certificateANS1 = certX509ToASN1(cert!);
   const certificateDER = forge.asn1.toDer(certificateANS1).getBytes();
   const hashCErtificateX509DER = sha1ToBase64(certificateDER, "utf-8");
-  const certificateX509SN = parseInt(hashCErtificateX509DER, 16);
+  const certificateX509SN = parseInt(cert?.serialNumber!, 16);
   const exponent = hexToBase64(key.e.data[0].toString(16));
   const modulus = bigintToBase64(BigInt(key.n.toString()));
 
