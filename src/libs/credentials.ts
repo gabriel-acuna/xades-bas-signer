@@ -127,14 +127,14 @@ export function getPCK12CertInfo(
   const exponent = hexToBase64(key.e.data[0].toString(16));
   const modulus = bigintToBase64(BigInt(key.n.toString()));
 
-  const certificateNumber = getRandomValues();
-  const signatureNumber = getRandomValues();
-  const signedPropertiesNumber = getRandomValues();
-  const signedInfoNumber = getRandomValues();
-  const signedPropertiesIdNumber = getRandomValues();
-  const referenceIdNumber = getRandomValues();
-  const signatureValueNumber = getRandomValues();
-  const objectNumber = getRandomValues();
+  const certificateNumber = getRandomValues(999990, 9999999);
+  const signatureNumber = getRandomValues(99990, 999999);
+  const signedPropertiesNumber = getRandomValues(99990, 999999);
+  const signedInfoNumber = getRandomValues(99990, 999999);
+  const signedPropertiesIdNumber = getRandomValues(99990, 999999);
+  const referenceIdNumber = getRandomValues(99990, 999999);
+  const signatureValueNumber = getRandomValues(99990, 999999);
+  const objectNumber = getRandomValues(99990, 999999);
 
   return {
     radomValues: {
