@@ -118,14 +118,15 @@ export function getPCK12CertInfo(
     pem.indexOf("\n") + 1,
     pem.indexOf("-----END CERTIFICATE-----")
   );
-  certificateX509.replace(/\r?\n|\r/g, "").replace(/([^\0]{76})/g, "$1\n");
+  certificateX509 = certificateX509.replace(/\r?\n|\r/g, "").replace(/([^\0]{76})/g, "$1\n");
   const ISODateTime = new Date().toISOString().slice(0, 19);
   const certificateANS1 = certX509ToASN1(cert!);
   const certificateDER = forge.asn1.toDer(certificateANS1).getBytes();
   const hashCErtificateX509DER = sha1ToBase64(certificateDER, "utf-8");
   const certificateX509SN = parseInt(cert?.serialNumber!, 16);
   const exponent = hexToBase64(key.e.data[0].toString(16));
-  const modulus = bigintToBase64(BigInt(key.n.toString()));
+  let modulus = bigintToBase64(BigInt(key.n.toString()));
+  modulus = modulus!.replace(/\r?\n|\r/g, '').replace(/([^\0]{76})/g, '$1\n');
 
   const certificateNumber = getRandomValues(999990, 9999999);
   const signatureNumber = getRandomValues(99990, 999999);
