@@ -45,7 +45,7 @@ function getSignedPropertiesNode(params: {
     `</etsi:Cert>` +
     `</etsi:SigningCertificate>` +
     `<etsi:SignedDataObjectProperties>` +
-    `<etsi:DataObjectFormat ObjectReference="#Reference-ID=${params.referenceIdNumber}">` +
+    `<etsi:DataObjectFormat ObjectReference="#Reference-ID-${params.referenceIdNumber}">` +
     `<etsi:Description>contenido comprobante</etsi:Description>` +
     `<etsi:MimeType>text/xml</etsi:MimeType>` +
     `</etsi:DataObjectFormat>` +
@@ -65,7 +65,7 @@ function getKeyInfoNode(params: {
     `\n<ds:X509Certificate>\n${params.certificateX509}\n</ds:X509Certificate>` +
     `\n</ds:X509Data>` +
     `\n</ds:KeyValue>\n<ds:RSAKeyValue>\n<ds:Modulus>\n${params.modulus}\n</ds:Modulus>` +
-    `\n<ds:Exponent>\n${params.exponent}</ds:Exponent>` +
+    `\n<ds:Exponent>${params.exponent}</ds:Exponent>` +
     `\n</ds:RSAKeyValue>` +
     `\n</ds:KeyInfo>`
   );
@@ -101,7 +101,7 @@ function getSignedInfoNode(params: {
     `\n<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"></ds:DigestMethod>` +
     `\n<ds:DigestValue>${params.sha1Xml}</ds:DigestValue>` +
     `\n</ds:Reference>` +
-    `</ds:SignedInfo>`
+    `\n</ds:SignedInfo>`
   );
 }
 function getSignatureObject(params: {
@@ -239,8 +239,8 @@ export async function sign(params: {
       .match(/.{1,76}/g)
       ?.join("\n") ?? "";
   const signatureValueNode =
-    `\n<ds:SignatureValue Id="SignatureValue${certInfo.radomValues.signatureValueNumber}">` +
-    `${signatureValue}\n</ds:SignatureValue>`;
+    `<ds:SignatureValue Id="SignatureValue${certInfo.radomValues.signatureValueNumber}">` +
+    `\n${signatureValue}\n</ds:SignatureValue>`;
   const objectSignature = getSignatureObject({
     signatureNumber: certInfo.radomValues.signatureNumber,
     objectNumber: certInfo.radomValues.objectNumber,
