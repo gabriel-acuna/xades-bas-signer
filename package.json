@@ -1,6 +1,6 @@
 {
   "name": "xades-bes-signer",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "XAdES-BES signer utilities for Node.js (TypeScript) — certificate handling and XAdES-BES signature helpers.",
   "main": "/dist/src/main.js",
   "types": "/dist/src/main.d.ts",
