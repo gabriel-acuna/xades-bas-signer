@@ -27,23 +27,24 @@ function getSignedPropertiesNode(params: {
   signingTime: string;
   digestValue: string;
   issuerName: string;
-  issuerSerialNumber: number;
+  issuerSerialNumber: string;
   referenceIdNumber: number;
 }) {
   return (
-    `<etsi:SignedProperties Id="Signature${params.signatureNumber} SignedProperties${params.signedPropertiesNumber}">` +
+    `<etsi:SignedProperties Id="Signature${params.signatureNumber}-SignedProperties${params.signedPropertiesNumber}">` +
     `<etsi:SignedSignatureProperties>` +
-    `<etsi:SignedTime>${params.signingTime}</etsi:SignedTime>` +
+    `<etsi:SigningTime>${params.signingTime}</etsi:SigningTime>` +
     `<etsi:SigningCertificate>` +
     `<etsi:Cert>` +
-    `<etsi:CertDigest><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1">` +
-    `<etsi:DigestValue>${params.digestValue}</etsi:DigestValue></etsi:CertDigest>` +
+    `<etsi:CertDigest><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>` +
+    `<ds:DigestValue>${params.digestValue}</ds:DigestValue></etsi:CertDigest>` +
     `<etsi:IssuerSerial>` +
     `<ds:X509IssuerName>${params.issuerName}</ds:X509IssuerName>` +
     `<ds:X509SerialNumber>${params.issuerSerialNumber}</ds:X509SerialNumber>` +
     `</etsi:IssuerSerial>` +
     `</etsi:Cert>` +
     `</etsi:SigningCertificate>` +
+    `</etsi:SignedSignatureProperties>` +
     `<etsi:SignedDataObjectProperties>` +
     `<etsi:DataObjectFormat ObjectReference="#Reference-ID-${params.referenceIdNumber}">` +
     `<etsi:Description>contenido comprobante</etsi:Description>` +
@@ -85,8 +86,8 @@ function getSignedInfoNode(params: {
     `<ds:SignedInfo Id="Signature-SignedInfo${params.signedInfoNumber}">` +
     `\n<ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n20010315"></ds:CanonicalizationMethod>` +
     `\n<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"></ds:SignatureMethod>` +
-    `\n<ds:Reference Id="SignedPropertiesID${params.signedPropertiesIdNumber}" `
-    +`Type="http://uri.etsi.org/01903#SignedProperties" URI="#Signature${params.signatureNumber}-SignedProperties${params.signedPropertiesNumber}">` +
+    `\n<ds:Reference Id="SignedPropertiesID${params.signedPropertiesIdNumber}" ` +
+    `Type="http://uri.etsi.org/01903#SignedProperties" URI="#Signature${params.signatureNumber}-SignedProperties${params.signedPropertiesNumber}">` +
     `\n<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"></ds:DigestMethod>` +
     `\n<ds:DigestValue>${params.sha1SignedProperties}</ds:DigestValue>` +
     `\n</ds:Reference>` +
@@ -140,7 +141,7 @@ function nodeCanonicalization(params: {
 }) {
   return params.content.replace(
     params.nodeName,
-    `${params.nodeName} ${params.namespaces}`
+    `${params.nodeName} ${params.namespaces}`,
   );
 }
 function addSignatureNode(params: {
@@ -178,7 +179,7 @@ export async function sign(params: {
 
   const sha1Xml = sha1ToBase64(
     xmlData.replace(`<?xml version="1.0" encoding="UTF-8"?>`, ""),
-    "utf8"
+    "utf8",
   );
   const namespaces =
     'xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:estsi="http://uri.etsi.org/01903/v1.3.2#"';
@@ -201,7 +202,7 @@ export async function sign(params: {
 
   const sha1SignedProperties = sha1ToBase64(
     signedPropertiesCanonicalized,
-    "utf8"
+    "utf8",
   );
 
   const keyInfo = getKeyInfoNode({
@@ -215,7 +216,7 @@ export async function sign(params: {
     nodeName: "<ds:KeyInfo",
     namespaces,
   });
-  const sha1KeyInfo = sha1ToBase64(keyInfoCanonicalized, "utf-8");
+  const sha1KeyInfo = sha1ToBase64(keyInfoCanonicalized);
 
   const signedInfo = getSignedInfoNode({
     signedInfoNumber: certInfo.radomValues.signedInfoNumber,
