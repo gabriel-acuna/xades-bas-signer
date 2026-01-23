@@ -1,5 +1,5 @@
 import * as forge from "node-forge";
-import { PKCS88Bags } from "./types";
+import { PKCS8Bags } from "./types";
 
 import {
   bigintToBase64,
@@ -30,8 +30,8 @@ export function getIssuerName(cert: forge.pkcs12.Bag) {
   return issuerName;
 }
 
-export function getKeyContainer(pkcs8Bags: PKCS88Bags, friendlyName: string) {
-  let pkcs8;
+export function getKeyContainer(pkcs8Bags: PKCS8Bags, friendlyName: string) {
+  let pkcs8: forge.pkcs12.Bag;
   const oid = forge.pki.oids["pkcs8ShroudedKeyBag"];
   const bags = pkcs8Bags?.[oid];
 
@@ -94,7 +94,7 @@ export function getPCK12CertInfo(
   certKey: string
 ) {
   const p12 = getP12(certificate, certKey);
-  const pkcs8Bags: PKCS88Bags = p12.getBags({
+  const pkcs8Bags: PKCS8Bags = p12.getBags({
     bagType: forge.pki.oids["pkcs8ShroudedKeyBag"],
   });
   const data = p12.getBags({ bagType: forge.pki.oids.certBag });
@@ -109,7 +109,7 @@ export function getPCK12CertInfo(
   }
   const cert = certBag.cert;
 
-  let pckcs8;
+  let pckcs8: forge.pkcs12.Bag;
   let issuerName = getIssuerName(certBag);
   pckcs8 = getKeyContainer(pkcs8Bags, friendlyName);
   let key = getKey(pckcs8);

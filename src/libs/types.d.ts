@@ -1,5 +1,5 @@
 import * as forge from 'node-forge'
-declare interface PKCS88Bags {
+declare interface PKCS8Bags {
     [key: string]: forge.pkcs12.Bag[] | undefined;
     localKeyId?: forge.pkcs12.Bag[] | undefined;
     friendlyName?: forge.pkcs12.Bag[] | undefined;
