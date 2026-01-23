@@ -65,9 +65,10 @@ function getKeyInfoNode(params: {
     `\n<ds:X509Data>` +
     `\n<ds:X509Certificate>\n${params.certificateX509}\n</ds:X509Certificate>` +
     `\n</ds:X509Data>` +
-    `\n</ds:KeyValue>\n<ds:RSAKeyValue>\n<ds:Modulus>\n${params.modulus}\n</ds:Modulus>` +
+    `\n<ds:KeyValue>\n<ds:RSAKeyValue>\n<ds:Modulus>\n${params.modulus}\n</ds:Modulus>` +
     `\n<ds:Exponent>${params.exponent}</ds:Exponent>` +
     `\n</ds:RSAKeyValue>` +
+    `\n</ds:KeyValue>` +
     `\n</ds:KeyInfo>`
   );
 }
