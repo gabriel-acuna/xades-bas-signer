@@ -9,10 +9,10 @@ import {
 } from "./security";
 export function getP12(
   certificate: Uint8Array<ArrayBufferLike>,
-  certKey: string
+  certKey: string,
 ): forge.pkcs12.Pkcs12Pfx {
   const der = forge.util.decode64(
-    forge.util.binary.base64.encode(new Uint8Array(certificate))
+    forge.util.binary.base64.encode(new Uint8Array(certificate)),
   );
 
   const ansi = forge.asn1.fromDer(der);
@@ -26,7 +26,7 @@ export function getIssuerName(cert: forge.pkcs12.Bag) {
     .map((attr) => {
       return `${attr.shortName}=${attr.value}`;
     })
-    .join(", ");
+    .join(",");
   return issuerName;
 }
 
@@ -41,7 +41,7 @@ export function getKeyContainer(pkcs8Bags: PKCS8Bags, friendlyName: string) {
 
   if (friendlyName.includes("BANCO CENTRAL")) {
     const index = bags.findIndex((key) =>
-      key?.attributes?.friendlyName?.[0]?.includes("Signing Key")
+      key?.attributes?.friendlyName?.[0]?.includes("Signing Key"),
     );
     if (!index) {
       throw new Error("Unable to find the key bag for BANCO CENTRAL");
@@ -58,7 +58,7 @@ export function getKey(pckcs8: forge.pkcs12.Bag) {
     key = pckcs8["key"] as forge.pki.rsa.PrivateKey;
   } else if (pckcs8["asn1"]) {
     key = forge.pki.privateKeyFromAsn1(
-      pckcs8["asn1"]
+      pckcs8["asn1"],
     ) as forge.pki.rsa.PrivateKey;
   } else {
     throw new Error("No private key found in the PKCS#12 key bag.");
@@ -73,7 +73,7 @@ export function getCertificate(certBag: forge.pkcs12.Bag[]) {
         (prev.cert?.extensions?.length ?? 0)
         ? current
         : prev;
-    }
+    },
   );
   return crt;
 }
@@ -91,7 +91,7 @@ export function certX509ToASN1(certificate: forge.pki.Certificate) {
 }
 export function getPCK12CertInfo(
   certificate: Uint8Array<ArrayBufferLike>,
-  certKey: string
+  certKey: string,
 ) {
   const p12 = getP12(certificate, certKey);
   const pkcs8Bags: PKCS8Bags = p12.getBags({
@@ -116,17 +116,29 @@ export function getPCK12CertInfo(
   const pem = certX509ToPem(cert!);
   let certificateX509 = pem.substring(
     pem.indexOf("\n") + 1,
-    pem.indexOf("-----END CERTIFICATE-----")
+    pem.indexOf("-----END CERTIFICATE-----"),
   );
-  certificateX509 = certificateX509.replace(/\r?\n|\r/g, "").replace(/([^\0]{76})/g, "$1\n");
-  const ISODateTime = new Date().toISOString().slice(0, 19);
+  certificateX509 = certificateX509
+    .replace(/\r?\n|\r/g, "")
+    .replace(/([^\0]{76})/g, "$1\n");
+  const currentDate = new Date();
+  const timeZone = (currentDate.getTimezoneOffset() / 60) * -1;
+  const signingTime =
+    `${currentDate.getFullYear()}-` +
+    `${(currentDate.getMonth() + 1).toString().padStart(2, "0")}-` +
+    `${currentDate.getDate().toString().padStart(2, "0")}T` +
+    `${currentDate.getHours().toString().padStart(2, "0")}:` +
+    `${currentDate.getMinutes().toString().padStart(2, "0")}:` +
+    `${currentDate.getSeconds().toString().padStart(2, "0")}` +
+    `${timeZone > 0 ? "+" : "-"}` +
+    `${(timeZone > 0 ? timeZone.toString() : timeZone.toString().substring(1)).padStart(2, "0")}:00`;
   const certificateANS1 = certX509ToASN1(cert!);
   const certificateDER = forge.asn1.toDer(certificateANS1).getBytes();
   const hashCErtificateX509DER = sha1ToBase64(certificateDER, "utf-8");
   const certificateX509SN = parseInt(cert?.serialNumber!, 16);
   const exponent = hexToBase64(key.e.data[0].toString(16));
   let modulus = bigintToBase64(BigInt(key.n.toString()));
-  modulus = modulus!.replace(/\r?\n|\r/g, '').replace(/([^\0]{76})/g, '$1\n');
+  modulus = modulus!.replace(/\r?\n|\r/g, "").replace(/([^\0]{76})/g, "$1\n");
 
   const certificateNumber = getRandomValues(999990, 9999999);
   const signatureNumber = getRandomValues(99990, 999999);
@@ -152,7 +164,7 @@ export function getPCK12CertInfo(
       digestValue: hashCErtificateX509DER,
       issuerName,
       issuerSerialNumber: certificateX509SN,
-      signingTime: ISODateTime,
+      signingTime: signingTime,
       certificateX509,
       modulus,
       exponent,
