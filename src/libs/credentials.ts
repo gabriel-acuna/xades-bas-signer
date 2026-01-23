@@ -134,8 +134,8 @@ export function getPCK12CertInfo(
     `${(timeZone > 0 ? timeZone.toString() : timeZone.toString().substring(1)).padStart(2, "0")}:00`;
   const certificateANS1 = certX509ToASN1(cert!);
   const certificateDER = forge.asn1.toDer(certificateANS1).getBytes();
-  const hashCErtificateX509DER = sha1ToBase64(certificateDER, "utf-8");
-  const certificateX509SN = parseInt(cert?.serialNumber!, 16);
+  const hashCertificateX509DER = sha1ToBase64(certificateDER);
+  const certificateX509SN = BigInt(`0x${cert!.serialNumber}`).toString(10);
   const exponent = hexToBase64(key.e.data[0].toString(16));
   let modulus = bigintToBase64(BigInt(key.n.toString()));
   modulus = modulus!.replace(/\r?\n|\r/g, "").replace(/([^\0]{76})/g, "$1\n");
@@ -161,7 +161,7 @@ export function getPCK12CertInfo(
       objectNumber,
     },
     certInfo: {
-      digestValue: hashCErtificateX509DER,
+      digestValue: hashCertificateX509DER,
       issuerName,
       issuerSerialNumber: certificateX509SN,
       signingTime: signingTime,
