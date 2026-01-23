@@ -85,22 +85,21 @@ function getSignedInfoNode(params: {
 }) {
   return (
     `<ds:SignedInfo Id="Signature-SignedInfo${params.signedInfoNumber}">` +
-    `\n<ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n20010315"></ds:CanonicalizationMethod>` +
-    `\n<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"></ds:SignatureMethod>` +
-    `\n<ds:Reference Id="SignedPropertiesID${params.signedPropertiesIdNumber}" ` +
-    `Type="http://uri.etsi.org/01903#SignedProperties" URI="#Signature${params.signatureNumber}-SignedProperties${params.signedPropertiesNumber}">` +
-    `\n<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"></ds:DigestMethod>` +
+    `\n<ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>` +
+    `\n<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>` +
+    `\n<ds:Reference Id="SignedPropertiesID${params.signedPropertiesIdNumber}" Type="http://uri.etsi.org/01903#SignedProperties" URI="#Signature${params.signatureNumber}-SignedProperties${params.signedPropertiesNumber}">` +
+    `\n<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>` +
     `\n<ds:DigestValue>${params.sha1SignedProperties}</ds:DigestValue>` +
     `\n</ds:Reference>` +
-    `\n<ds:Reference URI="Certificate${params.certificateNumber}">` +
-    `\n<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"></ds:DigestMethod>` +
+    `\n<ds:Reference URI="#Certificate${params.certificateNumber}">` +
+    `\n<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>` +
     `\n<ds:DigestValue>${params.sha1KeyInfo}</ds:DigestValue>` +
     `\n</ds:Reference>` +
     `\n<ds:Reference Id="Reference-ID-${params.referenceIdNumber}" URI="#comprobante">` +
     `\n<ds:Transforms>` +
-    `\n<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"></ds:Transform>` +
+    `\n<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>` +
     `\n</ds:Transforms>` +
-    `\n<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"></ds:DigestMethod>` +
+    `\n<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>` +
     `\n<ds:DigestValue>${params.sha1Xml}</ds:DigestValue>` +
     `\n</ds:Reference>` +
     `\n</ds:SignedInfo>`
