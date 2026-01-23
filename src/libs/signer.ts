@@ -172,7 +172,8 @@ export async function sign(params: {
     .replace(/(?=<\>)(\r?\n)|(\r?\n)(?=\<\/) /g, "")
     .trim()
     .replace(/(?=<\>)(\s*)/g, "")
-    .replace(/\t|\r/g, "");
+    .replace(/\t|\r/g, "")
+    .replace(/>\s+</g, "><");
 
   const arayuint8 = new Uint8Array(p12Buffer?.buffer!);
   let certInfo = getPCK12CertInfo(arayuint8, p12Password);
@@ -182,7 +183,7 @@ export async function sign(params: {
     "utf8",
   );
   const namespaces =
-    'xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:estsi="http://uri.etsi.org/01903/v1.3.2#"';
+    'xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:etsi="http://uri.etsi.org/01903/v1.3.2#"';
 
   let signedProperties = getSignedPropertiesNode({
     signatureNumber: certInfo.radomValues.signatureNumber,
@@ -200,10 +201,7 @@ export async function sign(params: {
     namespaces,
   });
 
-  const sha1SignedProperties = sha1ToBase64(
-    signedPropertiesCanonicalized,
-    "utf8",
-  );
+  const sha1SignedProperties = sha1ToBase64(signedPropertiesCanonicalized);
 
   const keyInfo = getKeyInfoNode({
     certificateNumber: certInfo.radomValues.certificateNumber,
@@ -256,7 +254,7 @@ export async function sign(params: {
     objectSignarureNode: objectSignature,
   });
   return addSignatureNode({
-    xml: xmlData,
+    xml: xmlData.replace(`encoding="UTF-8"?>`, 'encoding="UTF-8"?>\n'),
     rootElement: params.rootElement,
     signatureNode,
   });
