@@ -126,7 +126,7 @@ function getSignatureNode(params: {
   objectSignarureNode: string;
 }) {
   const signatureNode =
-    `\n<ds:Signature ${params.namespaces} Id="Signature${params.signatureNumber}">` +
+    `<ds:Signature ${params.namespaces} Id="Signature${params.signatureNumber}">` +
     `\n${params.signedInfoNode}` +
     `\n${params.signatureValueNode}` +
     `\n${params.keyInfoNode}` +
@@ -139,10 +139,10 @@ function nodeCanonicalization(params: {
   nodeName: string;
   namespaces: string;
 }) {
-  return params.content.replace(
-    params.nodeName,
-    `${params.nodeName} ${params.namespaces}`,
-  );
+  const regex = /<([a-zA-Z0-9:]+)([^>]*?)\/>/g;
+  return params.content
+    .replace(params.nodeName, `${params.nodeName} ${params.namespaces}`)
+    .replace(regex, "<$1$2></$1>");
 }
 function addSignatureNode(params: {
   xml: string;
