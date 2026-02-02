@@ -120,7 +120,7 @@ export function getPCK12CertInfo(
   );
   certificateX509 = certificateX509
     .replace(/\r?\n|\r/g, "")
-    .replace(/([^\0]{76})/g, "$1\n");
+    .match(/.{1,76}/g)?.join("\n") ?? '';
   const currentDate = new Date();
   const timeZone = (currentDate.getTimezoneOffset() / 60) * -1;
   const signingTime =
@@ -138,7 +138,6 @@ export function getPCK12CertInfo(
   const certificateX509SN = BigInt(`0x${cert!.serialNumber}`).toString(10);
   const exponent = hexToBase64(key.e.data[0].toString(16));
   let modulus = bigintToBase64(BigInt(key.n.toString()));
-  modulus = modulus!.replace(/\r?\n|\r/g, "").replace(/([^\0]{76})/g, "$1\n");
 
   const certificateNumber = getRandomValues(999990, 9999999);
   const signatureNumber = getRandomValues(99990, 999999);
